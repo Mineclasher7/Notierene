@@ -24,8 +24,8 @@ const Login = () => {
         validatePassword();
     }, [validateEmail, validatePassword]);
 
-    const navigate = useNavigate();
-
+    const navigate = useNavigate()
+    
     const signIn = async (event) => {
         event.preventDefault();
         try {

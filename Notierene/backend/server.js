@@ -53,8 +53,20 @@ app.post("/signup", async (req, res) => {
     }
 });
 
+/*
+app.post("/deleteAccount", verifyToken, async (req, res) => {
+    try {
+        const email = req.body.email;
+        await pool.query('DELETE * FROM users WHERE email = \$1', [email]);
+        res.status(201).json({ message: "User deleted", token: token });
+    } catch (error) {
+        res.status(500).json({ message: "Error deleting user", error: error.message });
+    }
+});
+*/
 
 app.post("/signin", async (req, res) => {
+    console.log("PISS");
     const { email, password } = req.body;
     try {
         const user = await pool.query('SELECT * FROM users WHERE email = \$1', [email]);
@@ -259,13 +271,6 @@ app.post("/deletePage", verifyToken, async (req, res) => {
     }
 
 });
-/*
-app.get('*', (req, res) => {
-    //console.log("SEND HERE")
-    res.sendFile(path.join(__dirname, '../frontend/public/index.html'));
-
-});
-*/
 
 app.listen(port, () => {
     console.log(`SERVER LISTENING ON ${port}`);
