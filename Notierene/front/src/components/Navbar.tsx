@@ -4,14 +4,20 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 
 const Navbar = () => {
-  const [jwtToken, setJwtToken] = useState(sessionStorage.getItem('jwtToken'));
+  const [jwtToken, setJwtToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      setJwtToken(sessionStorage.getItem('jwtToken'));
-    }, 1000); // Check every second
+    if (typeof window !== 'undefined') {
+      // Access sessionStorage only when in the browser
+      const token = sessionStorage.getItem('jwtToken');
+      setJwtToken(token);
 
-    return () => clearInterval(intervalId); // Clean up on unmount
+      const intervalId = setInterval(() => {
+        setJwtToken(sessionStorage.getItem('jwtToken'));
+      }, 1000); // Check every second
+
+      return () => clearInterval(intervalId); // Clean up on unmount
+    }
   }, []);
 
   return (
