@@ -23,10 +23,12 @@ PAGE NAV
 function verifyToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
+    console.log("SHITTER12")
     if (token == null) return res.sendStatus(401);
     
+    
     jwt.verify(token, process.env.SECRET_ACCESS_TOKEN, (err, user) => {
-
+        console.log(req)
         if (err) return res.sendStatus(403);
 
         req.user = user;
@@ -92,11 +94,9 @@ app.post("/signin", async (req, res) => {
     }
 });
 
-/*
 app.post("/signout", async (req, res) => {
 
 });
-*/
 
 app.get("/api/note", verifyToken, async (req, res) => {
     try {
@@ -108,7 +108,7 @@ app.get("/api/note", verifyToken, async (req, res) => {
         res.sendStatus(500);
     }
 });
-
+//Give user page HTML
 app.get("/api/note/:UUID", verifyToken, async (req, res) => {
     try {
         const UUID = req.params.UUID;
@@ -116,18 +116,45 @@ app.get("/api/note/:UUID", verifyToken, async (req, res) => {
         //have blocks as type and send all rooms
         //console.log(UUID)
         const page = await pool.query(`SELECT * FROM pages WHERE page_uid = \$1`, [UUID])
-        console.log("Page", page.rows[0])
-        block_order = page.rows[0].block_order
-        room_uid = page.rows[0].room_uid
-        const room = await pool.query(`SELECT page_order, title FROM rooms WHERE room_uid = \$1`, [room_uid]);
-        page_order = room.rows[0].page_order
-        title = room.rows[0].title
-        const pages = await pool.query(`SELECT page_uid, title FROM pages WHERE room_uid = \$1`, [room_uid])
-        const sortedPages = page_order.map(pageUid => pages.rows.find(page => page.page_uid === pageUid));
-        const blocks = await pool.query(`SELECT block_uid, content FROM blocks WHERE page_uid = \$1`, [UUID])
-        const sortedBlocks = block_order.map(blockUid => blocks.rows.find(block => block.block_uid === blockUid))
-        await pool.query('UPDATE users SET room_uid = \$1, page_uid = \$2 WHERE user_id = \$3', [room_uid, UUID, user_id]);
-        res.json({ page: page.rows[0], blocks:  sortedBlocks, pages: sortedPages, title: title});
+        if (page.rows.length > 0) { // Check if page exists
+            console.log("HI");
+            const block_order = page.rows[0].block_order;
+            const room_uid = page.rows[0].room_uid;
+
+            const room = await pool.query('SELECT page_order, title FROM rooms WHERE room_uid = $1', [room_uid]);
+            const page_order = room.rows[0].page_order;
+            const title = room.rows[0].title;
+
+            const pages = await pool.query('SELECT page_uid, title FROM pages WHERE room_uid = $1', [room_uid]);
+            const sortedPages = page_order.map(pageUid => pages.rows.find(page => page.page_uid === pageUid));
+
+            const blocks = await pool.query('SELECT block_uid, content FROM blocks WHERE page_uid = $1', [UUID]);
+            const sortedBlocks = block_order.map(blockUid => blocks.rows.find(block => block.block_uid === blockUid));
+
+            await pool.query('UPDATE users SET room_uid = $1, page_uid = $2 WHERE user_id = $3', [room_uid, UUID, user_id]);
+
+            res.json({ page: page.rows[0], blocks: sortedBlocks, pages: sortedPages, title: title });
+        } else {
+            res.status(404).json({ message: "Page not found" }); // Return 404 if page not found
+        }
+        
+    } catch (error) {
+        console.error(error);
+        res.sendStatus(500);
+    }
+});
+
+app.post("/api/note/:UUID/requestLink", verifyToken, async (req, res) => {
+    try {
+        const UUID = req.params.UUID;
+        const reqTitle = req.body.title; // Assuming title is sent in the request body
+        const room_uid_result = await pool.query(`SELECT room_uid FROM pages WHERE page_uid = \$1`, [UUID]);
+        const room_uid = room_uid_result.rows[0].room_uid;
+        const page_result = await pool.query(`SELECT * FROM pages WHERE title = \$1 AND room_uid = \$2`, [reqTitle, room_uid]);
+
+        const page = page_result.rows[0];
+        console.log(page_result.rows[0])
+        res.json({ page });
     } catch (error) {
         console.error(error);
         res.sendStatus(500);
@@ -180,15 +207,18 @@ app.post("/api/note/:UUID/deleteBlock", verifyToken, async (req, res) => {
     }
 });
 
+//Save page change content
 app.post("/api/note/:UUID/saveData", verifyToken, async (req, res) => {
     try {
         const UUID = req.params.UUID
         const user_id = req.user_id;
         const block_uid = req.body.block_uid;
         const content = req.body.content;
+        //If block uid is title uid change title, else change block
         if (block_uid === UUID) {
             await pool.query(`UPDATE pages SET title = \$1 WHERE page_uid = \$2`, [content, UUID])
         } else {
+
             await pool.query(`UPDATE blocks SET content = jsonb_set(content, '{content}', to_jsonb(\$1::jsonb), false) WHERE block_uid = \$2`, [JSON.stringify(content), block_uid])
         }
         res.sendStatus(200)

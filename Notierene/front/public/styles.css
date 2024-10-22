@@ -1,0 +1,115 @@
+* {
+    box-sizing: border-box;
+    outline: 0;
+}
+
+
+.frame {
+    margin: auto;
+    flex-grow: 0;
+    flex-shrink: 1;
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
+    height: calc(100vh - 45px);
+    max-height: 100%;
+    position: relative;
+    width: 1048px;
+}
+
+.note {
+    text-align: left;
+    width: 100%;
+    max-width: 846px;
+    margin-top: 1px;
+    margin-bottom: 0px;
+}
+
+.page-content {
+    margin: auto;
+    flex-shrink: 0;
+    flex-grow: 1;
+    max-width: 900px;
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    font-size: 16px;
+    line-height: 1.5;
+    width: 100%;
+    z-index: 4;
+    padding-bottom: 30vh;
+    padding-left: calc(96px + env(safe-area-inset-left));
+    padding-right: calc(96px + env(safe-area-inset-right));
+}
+
+.title {
+    font-size: 50px;
+    margin: auto;
+    text-align: left;
+    outline: 0;
+    max-width: 900px;
+    width: 100%;
+    white-space: pre-wrap;
+    word-break: break-word;
+    caret-color: rgb(55, 53, 47);
+    padding: 3px 2px;
+    font-size: 1em;
+    font-weight: inherit;
+    margin: 0px;
+}
+
+.main-content {
+    flex-grow: 1;
+    /* Add any additional styles for your main content here */
+}
+
+
+.notieren-app {
+    display: flex;
+}
+
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+* {
+    box-sizing: border-box;
+    outline: 0;
+}
+
+.sidebar {
+    align-items: center;
+    text-align: center;
+    background-color: black;
+    position: fixed;
+    width: 15%; /* 1/8 of the parent width */
+    height: 100vh; /* Full height of the viewport */
+    overflow: hidden; /* Prevents overflow */
+    padding: 1rem; /* Add padding to the sidebar */
+}
+
+.sidebar-link {
+    width: 85%; /* Ensure the link takes up the full width */
+}
+
+.link-text {
+    width: 85%;
+    text-overflow: ellipsis; /* Adds ellipsis for overflowing text */
+    white-space: nowrap; /* Prevents text from wrapping */
+    margin-right: 0.5rem; /* Add some space between text and delete button */
+}
+
+.page-delete {
+    flex-shrink: 0; /* Prevents the delete button from shrinking */
+    padding: 0px 5px; /* Add some padding to the delete button */
+    color: red; /* Ensure the delete button is visible */
+    cursor: pointer; /* Change cursor to pointer */
+    width: 1.5rem; /* Fixed width for the delete button */
+}

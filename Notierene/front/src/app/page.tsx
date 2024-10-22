@@ -1,7 +1,8 @@
-// Home.js
-import React, { useState } from 'react';
-import Modal from './Modal';
-import getRandomQuote from './RandomQuote';
+// pages/index.js
+'use client'
+import { useState } from 'react';
+import Modal from '../components/Modal'
+import getRandomQuote from '../components/RandomQuote';
 
 const Home = () => {
     const [openModal, setOpenModal] = useState(false);
@@ -13,8 +14,8 @@ const Home = () => {
     };
 
     return (
-        <div>
-            <h1>Notieren</h1>
+        <div className="align-center text-center">
+            <h1 className='text-2xl'>Nootieren</h1>
             <img src="." alt="Notieren" />
             <p>Welcome to the Notieren website. Making notes for superior learning.</p>
             <p>This is a project for making notes actually good.</p>
